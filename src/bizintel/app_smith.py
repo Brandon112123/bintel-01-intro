@@ -46,6 +46,7 @@ from bizintel.utils_logger import LOG
 
 # Raw data folder path (relative to the root project folder).
 DATA_RAW: Final[Path] = Path("data/raw")
+IMAGES_DIR: Final[Path] = Path("docs/images")
 
 # The three raw data files for the smart sales project.
 CUSTOMERS_FILE: Final[Path] = DATA_RAW / "customers_data.csv"
@@ -280,7 +281,7 @@ def main() -> None:
     log_path(LOG, "Customers:", CUSTOMERS_FILE)
     log_path(LOG, "Products: ", PRODUCTS_FILE)
     log_path(LOG, "Sales:    ", SALES_FILE)
-
+    IMAGES_DIR.mkdir(parents=True, exist_ok=True)
     LOG.info("CALL a function to load each dataset.............")
     df_customers = load_data(CUSTOMERS_FILE, "customers")
     df_products = load_data(PRODUCTS_FILE, "products")
@@ -290,23 +291,28 @@ def main() -> None:
     df_region = sales_by_region(df_customers, df_sales)
 
     LOG.info("CALL a function to plot sales by region as a line chart........")
+    fig, ax = plt.subplots(figsize=(8, 5))
     df_region.plot(
         kind="line",
         x="Region",
         y="SaleAmount",
         marker="o",
-        figsize=(8, 5),
+        ax=ax,
     )
 
-    plt.title("Total Sales by Region")
-    plt.xlabel("Region")
-    plt.ylabel("Total Sales Amount ($)")
+    ax.set_title("Total Sales by Region")
+    ax.set_xlabel("Region")
+    ax.set_ylabel("Total Sales Amount ($)")
     plt.xticks(rotation=45)
+    fig.tight_layout()
+    fig.savefig(IMAGES_DIR / "Figure_1.png")
+    LOG.info(f"Saved Figure 1 to: {(IMAGES_DIR / 'Figure_1.png').resolve()}")
 
     LOG.info("CALL a function to get sales by product category........")
     df_category = sales_by_category(df_products, df_sales)
 
     LOG.info("CALL a function to plot sales by product category as a pie chart........")
+    fig, ax = plt.subplots(figsize=(8, 5))
     df_category.plot(
         kind="pie",
         y="SaleAmount",
@@ -314,14 +320,19 @@ def main() -> None:
         autopct="%1.1f%%",
         legend=False,
         title="Sales Share by Product Category",
+        ax=ax,
     )
-    plt.ylabel("")
+
+    ax.set_ylabel("")
+    fig.tight_layout()
+    fig.savefig(IMAGES_DIR / "Figure_2.png")
+    LOG.info(f"Saved Figure 2 to: {(IMAGES_DIR / 'Figure_2.png').resolve()}")
 
     LOG.info("CALL a function to summarize the datasets........")
     summarize(df_customers, df_products, df_sales)
 
-    LOG.info("CALL a function to show charts........")
-    plt.show()
+    LOG.info("CALL a function to close charts........")
+    plt.close("all")
 
     LOG.info("Workflow complete")
     LOG.info("CLOSE chart windows to continue.")

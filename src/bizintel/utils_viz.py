@@ -11,12 +11,17 @@ Customize charts for the story they tell.
 
 # === IMPORTS ===
 
+from pathlib import Path
+
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
 from bizintel.utils_logger import LOG
+
+IMAGES_DIR = Path(__file__).resolve().parent / "images"
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # === FUNCTIONS ===
 
@@ -67,6 +72,7 @@ def plot_bar(
     bar.set_ylabel(ylabel)
 
     plt.tight_layout()
+    plt.savefig(IMAGES_DIR / "Figure_1.png")  # pyright: ignore[reportUndefinedVariable]
 
 
 def plot_line(
@@ -110,3 +116,4 @@ def plot_line(
     line.set_ylabel(ylabel)
 
     plt.tight_layout()
+    plt.savefig(IMAGES_DIR / "Figure_2.png")
